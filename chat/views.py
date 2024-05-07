@@ -7,6 +7,7 @@ from rest_framework import status
 from constants.constants import ACTION,ANSWER,ARGUMENTS,ASSISTANT,AUTHOR,CONTENT,DATA,EMBEDDING,ENDPT,ERROR,FMR,FUN_CALL,FUNCTION, INDEX,METH,MSG,NAME,ROLE,SUBJECTS,SYSTEM,TIMESTAMP,USER
 from constants.messages import CHAT_HISTORY, QUERY_ERROR,QUERY_SUCCESS
 
+from main import llm
 
 class Chat(APIView):
 
