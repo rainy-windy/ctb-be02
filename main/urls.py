@@ -8,7 +8,7 @@ from chat import views as ChatAPI
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include([
-        path("chat/", ChatAPI.Chat.as_view()),
+        path("chat/<str:cid>", ChatAPI.Chat.as_view()),
     ])),
 ]
 
