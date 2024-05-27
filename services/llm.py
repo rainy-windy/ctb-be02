@@ -1,22 +1,28 @@
 import requests
 from langchain.chat_models import ChatOpenAI
+from langchain.chains import LLMChain, RetrievalQA, SequentialChain
 from langchain.prompts import MessagesPlaceholder, HumanMessagePromptTemplate, ChatPromptTemplate
 from langchain.memory import ConversationSummaryMemory, ConversationBufferMemory, FileChatMessageHistory
-from langchain.chains import LLMChain, SequentialChain
+from langchain.vectorstores.chroma import Chroma
 
-
+from services.embedder import VectorStore
 from constants.constants import AUTHORISATION, ACCESS, GPT_URL, USERNAME, PASSWORD
 
-# This is the external LLM
+
+# This is the external LLM – OpenAI
 class LLM():
 
-    def __new__(c, key=None):
+    store = None
+
+    def __new__(c, key: str=None):
         if not hasattr(c, "instance"):
             c.instance = super(LLM, c).__new__(c)
             return c.instance
         
 
-    def __init__(self, key=None):
+    def __init__(self, db: VectorStore, key: str=None) -> None:
+        self.store = db
+
         self.chat = ChatOpenAI(
             openai_api_key = key,
             verbose = True
@@ -47,6 +53,17 @@ class LLM():
         print("\nLLM Initilialised\n")
 
 
+    def retrieve(self, string: str):
+        #similarity search
+        chain = RetrievalQA.from_chain_type(
+            llm=self.chat,
+            retriever=self.store.as_retriever(),
+            chain_type="stuff"
+        )
+
+        return chain.run(string)
+
+
     def post(self, content):
         try:
             result = self.chain({
@@ -75,7 +92,7 @@ class SGPT():
             return c.instance
         
 
-    def __init__(self, user: str, password: str):
+    def __init__(self, user: str, password: str) -> None:
         if(self.token is not None):
             self.header[AUTHORISATION] = f"Bearer {self.token}"
 
@@ -86,15 +103,13 @@ class SGPT():
             )
 
             if not response.status_code == 200:
-                print("\nToken is invalid. Logging in now. . .\n")
                 self.login(user, password)
-                return
             
         else:
             self.login(user, password)
 
 
-    def login(self, user: str, password: str):
+    def login(self, user: str, password: str) -> None:
         try:
             response = requests.post(
                 f"{self.baseURL}/auth/login", 

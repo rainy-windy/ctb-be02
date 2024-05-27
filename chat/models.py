@@ -1,3 +1,8 @@
-from django.db import models
+from pydantic import BaseModel, Extra
 
-# Create your models here.
+
+class Message(BaseModel):
+    content: str
+    id: str
+    role: str
+    

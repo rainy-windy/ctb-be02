@@ -1,7 +1,7 @@
 from langchain.document_loaders import TextLoader
+from langchain.chat_models import ChatOpenAI
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.document_loaders import PyPDFLoader
-from langchain.chains import RetrievalQA
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores.chroma import Chroma
 
@@ -12,27 +12,19 @@ class VectorStore():
     store=None
 
 
-    def __init__(self, ) -> None:
+    def __init__(self ) -> None:
         self.store = Chroma(
             embedding_function=self.embedder,   
-            persist_directory="embeddings",
+            persist_directory="vectors",
         )
     
     
-    def repopulate(self, documents):
+    def repopulate(self, documents) -> None:
         self.store = Chroma.from_documents(
             documents, 
             embedding=self.embedder,
-            persist_directory="embeddings"
+            persist_directory="vectors"
         )
-    
-    def retrieve():
-        chain = RetrievalQA.from_chain_type(
-            llm=chat,
-            retriever=store.as_retriever(),
-            chain_type="stuff"
-        )
-
     
 
 class Chunker():
